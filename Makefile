@@ -28,9 +28,12 @@ SRC_FT = wlf_main \
 		 wlf_put_in_map \
 		 wlf_start_aff \
 		 mlx_pix_img \
-		 wolf3d \
 		 wlf_init_all \
-		 hook
+		 hook \
+		 wlf_rendu \
+		 wlf_minimap \
+		 wlf_game \
+		 wlf_load
 
 ## List of Utilities
 
@@ -43,18 +46,18 @@ all: $(NAME)
 	@echo "$(COLOR)$(NAME)\t\t\0033[1;30m[All OK]\0033[0;37m"
 
 $(OBJ_DIR):
-	@afplay rupee.mp3 &
+	@afplay file/rupee.mp3 &
 	@mkdir -p $@
 	@echo "$(COLOR)Creating    : \0033[0;32m$@\0033[0;37m"
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(INC_DIR)/wolf3d.h
 	@$(CC) -c $< -o $@
 	@echo "$(COLOR)Compilating : \0033[0;32m$(@:$(OBJ_DIR)/%=%)\0033[0;37m"
 
-$(NAME): $(OBJ_DIR) $(SRC)
-	@$(MAKE) $(OBJ)
+$(NAME): $(OBJ_DIR) $(SRC) $(INC_DIR)/wolf3d.h
+	@$(MAKE) -j -s $(OBJ)
 	@echo "$(COLOR)Objects\t\t\0033[0;32m[Created]\0033[0;37m"
-	@make -j -C $(LIB_DIR)
+	@make -j -s -C $(LIB_DIR)
 	@$(CC) $(LIB) $(OBJ) $(MLX) -o $@
 	@echo "$(COLOR)$(NAME)\t\t\0033[0;32m[Created]\0033[0;37m"
 

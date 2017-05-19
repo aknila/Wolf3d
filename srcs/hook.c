@@ -6,7 +6,7 @@
 /*   By: aancel <aancel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/05 02:49:45 by aancel            #+#    #+#             */
-/*   Updated: 2017/05/07 14:28:51 by aancel           ###   ########.fr       */
+/*   Updated: 2017/05/13 18:46:30 by aancel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,16 @@ int		key_press(int k, t_ptr *ptr)
 	if (k == 123)
 		ptr->key->left = 1;
 	if (k == 49)
-		system("afplay ah.mp3 &");
+		system("afplay file/ah.mp3 &");
 	if (k == 6)
 	{
 		ptr->key->crouch = 1;
 		wlf_aff_rendu(ptr);
 	}
+	if (k == 46)
+		ptr->key->map ^= 1;
+	if (k == 36)
+		ptr->key->enter = (ptr->key->enter == 1 ? 0 : 1);
 	if (k == 257 || k == 8 || k == 53 || (k >= 82 && k <= 89))
 		key_press2(k, ptr);
 	return (0);
@@ -67,7 +71,7 @@ int		key_release(int k, t_ptr *ptr)
 		ptr->key->crouch = 0;
 	if (k == 257)
 		ptr->key->sprint = 0;
-	if (ptr->key->chg > 18)
+	if (ptr->key->chg > 18 && !ptr->key->map)
 		wlf_aff_rendu(ptr);
 	return (0);
 }
@@ -80,7 +84,7 @@ int		mouse_code(int button, int x, int y, t_ptr *ptr)
 		ptr->menu->skb = 1;
 	else if (x >= 232 && y >= 284 && x <= 348 && y <= 400)
 		ptr->menu->skb = 0;
-	else if (x >= 110 && y >= 400 && x <= 232 
+	else if (x >= 110 && y >= 400 && x <= 232
 		&& y <= 520 && ptr->menu->skbsel != 4)
 		ptr->menu->skbmv = 1;
 	else if (x >= 232 && y >= 400 && x <= 348 && y <= 520)

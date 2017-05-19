@@ -6,19 +6,65 @@
 /*   By: aancel <aancel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/05 02:49:45 by aancel            #+#    #+#             */
-/*   Updated: 2017/05/03 04:48:17 by aancel           ###   ########.fr       */
+/*   Updated: 2017/05/13 18:43:59 by aancel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/wolf3d.h"
 
-char	*wlf_extracting(int fd)
+void		wlf_set_env(t_ptr *ptr)
 {
-	char	*tmp;
+	t_file	*sky;
+	t_key	*key;
+	t_file	*txt;
+
+	sky = (t_file *)malloc(sizeof(t_file));
+	init_skybox(sky, ptr);
+	ptr->sky = sky;
+	loading_file(ptr);
+	wlf_initialis(ptr);
+	txt = (t_file *)malloc(sizeof(t_file));
+	init_text(txt, ptr);
+	ptr->txt = txt;
+	key = (t_key *)malloc(sizeof(t_key));
+	init_key(key);
+	ptr->key = key;
+}
+
+char		*ft_strjoin_free(char *s1, char *s2)
+{
+	int		i;
+	int		n;
+	char	*dest;
+
+	n = 0;
+	if (!s1 || !s2)
+		return (NULL);
+	dest = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
+	if (dest == NULL)
+		return (NULL);
+	while (s1[n])
+	{
+		dest[n] = s1[n];
+		n++;
+	}
+	i = 0;
+	while (s2[i])
+	{
+		dest[n++] = s2[i];
+		i++;
+	}
+	dest[n] = '\0';
+	free(s1);
+	free(s2);
+	return (dest);
+}
+
+char		*wlf_extracting(int fd)
+{
 	char	*str;
 	char	*buf;
 
-	tmp = NULL;
 	if (!(str = (char *)malloc(sizeof(char) * 11)))
 		return (NULL);
 	if (!(buf = (char *)malloc(sizeof(char) * 10001)))
@@ -27,48 +73,46 @@ char	*wlf_extracting(int fd)
 	ft_memset(str, '\0', 11);
 	while (read(fd, buf, 10000) > 0)
 	{
-		tmp = str;
-		if (!(str = ft_strjoin(str, buf)))
-		{
-			ft_strdel(&tmp);
+		if (!(str = ft_strjoin_free(str, buf)))
 			return (NULL);
-		}
-		ft_strdel(&tmp);
-		ft_memset(buf, '\0', 10000);
+		if (!(buf = (char *)malloc(sizeof(char) * 10001)))
+			return (NULL);
+		ft_memset(buf, '\0', 10001);
 	}
+	free(buf);
 	return (str);
 }
 
-int		**wlf_put_in_map(int **map, int fd)
+int			**wlf_put_in_map(int **map, int fd, int mx, int my)
 {
-	int		n;
-	int		s;
-	int		i;
-	char	*str;
+	t_stc	st;
 
-	n = 0;
-	i = 0;
-	s = 0;
-	if (!(str = wlf_extracting(fd)))
+	st.n = 0;
+	st.i = 0;
+	st.s = 0;
+	if (!(st.str = wlf_extracting(fd)))
 		return (NULL);
-	while (str[i])
+	while (st.str[st.i])
 	{
-		if (str[i] == '-' || (str[i] >= '0' && str[i] <= '9'))
+		if (st.str[st.i] == '-' || (st.str[st.i] >= '0' && st.str[st.i] <= '9'))
 		{
-			map[n][s++] = ft_atoi(&str[i]);
-			while (str[i] && (str[i] == '-'
-				|| (str[i] >= '0' && str[i] <= '9')))
-				i++;
+			map[st.n][st.s] = ft_atoi(&st.str[st.i]);
+			while (st.str[st.i] && (st.str[st.i] >= '0' && st.str[st.i] <= '9'))
+				st.i++;
 		}
-		n += (str[i] && str[i] == '\n' ? 1 : 0);
-		s = (str[i] && str[i++] == '\n' ? 0 : s);
-		i += (str[i] && str[i] == ' ' ? 1 : 0);
+		if ((st.n == 0 || st.n == my - 1 || st.s == 0 || st.s == mx - 1)
+			&& map[st.n][st.s] != 1)
+			map[st.n][st.s] = 1;
+		st.s++;
+		st.n += (st.str[st.i] && st.str[st.i] == '\n' ? 1 : 0);
+		st.s = (st.str[st.i] && st.str[st.i++] == '\n' ? 0 : st.s);
+		st.i += (st.str[st.i] && st.str[st.i] == ' ' ? 1 : 0);
 	}
-	free(str);
+	free(st.str);
 	return (map);
 }
 
-void	mlx_put_line(t_ptr *ptr)
+void		mlx_put_line(t_ptr *ptr)
 {
 	t_line	l;
 

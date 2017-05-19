@@ -6,11 +6,18 @@
 /*   By: aancel <aancel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/05 02:49:45 by aancel            #+#    #+#             */
-/*   Updated: 2017/05/07 16:36:41 by aancel           ###   ########.fr       */
+/*   Updated: 2017/05/13 18:43:57 by aancel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/wolf3d.h"
+
+int		wlf_close(void)
+{
+	system("killall afplay");
+	exit(0);
+	return (0);
+}
 
 int		ft_error(int error)
 {
@@ -21,8 +28,13 @@ int		ft_error(int error)
 	if (error == 2)
 		ft_putstr(C_ROUGE "\tusage : ./wolf3d {filename}\n" FIN);
 	if (error == 3)
-		ft_putstr(C_ROUGE 
+		ft_putstr(C_ROUGE
 			"\tan error occured, please retry in few second\n" FIN);
+	if (error == 4)
+		ft_putstr(C_ROUGE "\terror : map without spawn case ('5')\n" FIN);
+	if (error == 5)
+		ft_putstr(C_ROUGE "\terror : failed to load ressource\n" FIN);
+	exit(0);
 	return (-1);
 }
 
@@ -53,7 +65,6 @@ int		main(int argc, char **argv)
 	int		fd;
 	char	buf[1];
 
-	system("afplay gamecube.mp3 &");
 	if (argc != 2)
 		return (ft_error(2));
 	if (wlf_check_ext(argv[1]) == -1)

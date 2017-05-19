@@ -6,7 +6,7 @@
 /*   By: aancel <aancel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/05 02:49:45 by aancel            #+#    #+#             */
-/*   Updated: 2017/05/07 14:56:06 by aancel           ###   ########.fr       */
+/*   Updated: 2017/05/14 19:36:41 by aancel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,14 @@ typedef struct	s_line
 	int		sy;
 	int		e2;
 }				t_line;
+
+typedef struct	s_stc
+{
+	int			n;
+	int			s;
+	int			i;
+	char		*str;
+}				t_stc;
 
 typedef struct	s_img
 {
@@ -107,8 +115,43 @@ typedef struct	s_key
 	int			c;
 	int			menu;
 	int			chg;
-	int			plus;
+	int			enter;
+	int			map;
 }				t_key;
+
+typedef struct	s_mini
+{
+	int			a;
+	int			b;
+	int			i;
+	int			j;
+	int			i2;
+	int			j2;
+	int			sz;
+	int			di;
+	int			dj;
+}				t_mini;
+
+typedef struct	s_rend
+{
+	t_ptd		dir;
+	int			x;
+	int			w;
+	double		cam;
+	t_ptd		rpos;
+	t_ptd		rdir;
+	t_pti		map;
+	t_ptd		fdist;
+	t_ptd		ddist;
+	t_pti		step;
+	t_ptd		wall;
+	int			hit;
+	int			side;
+	double		wdist;
+	int			lineh;
+	int			drawst;
+	int			drawend;
+}				t_rend;
 
 typedef struct	s_menu
 {
@@ -122,8 +165,7 @@ typedef struct	s_ptr
 {
 	t_map		*map;
 	t_img		*img;
-	t_img		*menul;
-	t_img		*menud;
+	t_img		*minimap;
 	t_menu		*menu;
 	t_vec		*vec;
 	t_file		*sky;
@@ -162,51 +204,63 @@ typedef struct	s_ptr
 	int			crouch;
 	double		movespeed;
 	double		rotspeed;
+	int			sz;
 }				t_ptr;
 
-int				main(int argc, char **argv);
-int				wlf_check_ext(char *str);
-int				ft_error(int error);
-t_map			*wlf_map_extract(int fd, char *filename);
-int				wlf_check_file2(char **str1, int *l, int *a);
-int				wlf_check_file(int *l, int *a, int fd);
-int				ft_isfullnum(char *str);
-int				ft_count_s(char *str);
-int				**wlf_put_in_map(int **map, int fd);
-char			*wlf_extracting(int fd);
-void			wlf_aff_map(t_map *m);
-void			wlf_aff_rendu(t_ptr *ptr);
-int				wlf_close(void);
-void			wlf_draw_img(t_ptr *ptr);
-void			mlx_pix_img(t_ptr *ptr, int x, int y, int color);
-void			mlx_clr_img(t_ptr *ptr);
-void			mlx_put_line(t_ptr *ptr);
-void			mlx_img_copy(t_ptr *ptr, int x, int y, t_pti dec);
-void   			draw_vis(t_ptr *ptr);
-int				scnd_main(char *argv);
-char			*name(int x);
-char			*name2(int x);
 void			aff_charge(int i, t_ptr *ptr);
-void			set_menu(char id, t_img *img);
-void			mlx_pix_put(t_img *img, int x, int y, int color);
-void			aff_menu(t_ptr *ptr);
 void			aff_choice(t_ptr *ptr);
-void			init_menu(t_menu *menu);
-void			mlx_textur(t_ptr *ptr, int x, t_ptd wall, int line);
-void			init_text(t_file *txt, t_ptr *ptr);
-int				wlf_move(char k, t_ptr *ptr);
-int				wlf_rot(char k, t_ptr *ptr);
-void			init_skybox(t_file *sky, t_ptr *ptr);
-void			wlf_initialis(t_ptr *ptr);
+void			aff_choice2(t_ptr *ptr);
+void			aff_menu(t_ptr *ptr);
+void			draw_vis(t_ptr *ptr);
+int				ft_count_s(char *str);
+int				ft_error(int error);
+int				ft_isfullnum(char *str);
+char			*ft_strjoin_free(char *s1, char *s2);
+int				game_loop(t_ptr *ptr);
+int				game_loop2(t_ptr *ptr);
 void			init_key(t_key	*key);
-void	 		init_map(t_map *map, t_ptr *ptr);
-int				key_press2(int k, t_ptr *ptr);
-void			set_color(t_ptr *ptr);
+void			init_map(t_map *map, t_ptr *ptr);
+void			init_menu(t_ptr *ptr);
+void			init_skybox(t_file *sky, t_ptr *ptr);
+void			init_text(t_file *txt, t_ptr *ptr);
 int				key_press(int k, t_ptr *ptr);
 int				key_press2(int k, t_ptr *ptr);
 int				key_release(int k, t_ptr *ptr);
+void			loading_file(t_ptr *ptr);
+int				main(int argc, char **argv);
+int				mlx_aff_point(int x, int y, t_ptr *ptr, int color);
+void			mlx_clr_img(t_ptr *ptr);
+void			mlx_img_copy(t_ptr *ptr, int x, int y, t_pti dec);
+void			mlx_pix_img(t_ptr *ptr, int x, int y, int color);
+void			mlx_pix_put(t_img *img, int x, int y, int color);
+void			mlx_put_line(t_ptr *ptr);
+void			mlx_textur(t_ptr *ptr, int x, t_ptd wall, int line);
 int				mouse_code(int button, int x, int y, t_ptr *ptr);
 int				mouse_code2(int x, int y, t_ptr *ptr);
-void			loading_file(t_ptr *ptr);
+char			*name(int x);
+char			*name2(int x);
+int				scnd_main(char *argv);
+void			set_color(t_ptr *ptr);
+void			set_menu(char id, t_img *img);
+void			wlf_aff_map(t_map *m);
+void			wlf_aff_rendu(t_ptr *ptr);
+int				wlf_check_ext(char *str);
+int				wlf_check_file(int *l, int *a, int fd);
+int				wlf_check_file2(char **str1, int *l, int *a);
+int				wlf_close(void);
+void			wlf_draw_img(t_ptr *ptr);
+char			*wlf_extracting(int fd);
+void			wlf_initialis(t_ptr *ptr);
+void			wlf_map(t_ptr *ptr);
+void			wlf_map2(t_mini m, t_ptr *ptr);
+t_map			*wlf_map_extract(int fd, char *filename);
+void			wlf_minimap(t_ptr *ptr);
+void			wlf_minimap2(t_mini mn, t_ptr *ptr);
+void			wlf_minimap3(t_mini m, t_ptr *ptr);
+int				wlf_move(char k, t_ptr *ptr);
+int				**wlf_put_in_map(int **map, int fd, int my, int mx);
+int				wlf_rot(char k, t_ptr *ptr);
+void			wlf_set_env(t_ptr *ptr);
+double			wlf_spawn(char c, t_map *map);
 
 #endif

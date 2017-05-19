@@ -6,7 +6,7 @@
 /*   By: aancel <aancel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/12/05 02:49:45 by aancel            #+#    #+#             */
-/*   Updated: 2017/05/07 13:26:31 by aancel           ###   ########.fr       */
+/*   Updated: 2017/05/13 18:43:57 by aancel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,9 @@ int		ft_count_s(char *str)
 		i++;
 	while (str[i])
 	{
-		if (str[i] == ' ' && str[i + 1] != ' ' && str[i + 1] != '\n')
+		if (str[i] == ' ' && str[i + 1] == ' ')
+			ft_error(0);
+		if (str[i] == ' ' && str[i + 1] != '\n')
 			s++;
 		i++;
 	}
@@ -38,12 +40,12 @@ int		ft_isfullnum(char *str)
 	i = 0;
 	while (str[i])
 	{
-		if ((str[i] > 64 && str[i] < 91) || (str[i] > 96 && str[i] < 123))
+		if (ft_isdigit(str[i]) == 0 && str[i] != ' '
+			&& str[i] != '\0' && str[i] != '\n')
 			return (-1);
-		else if (str[i] == '-' && ft_isdigit(str[i + 1]) == 0)
+		if (str[i] == '\n' && str[i + 1] == '\n')
 			return (-1);
-		else if (ft_isdigit(str[i]) == 0 && str[i] != ' '
-			&& str[i] != '\0' && str[i] != '-')
+		if (str[0] == '\n')
 			return (-1);
 		i++;
 	}
@@ -53,10 +55,8 @@ int		ft_isfullnum(char *str)
 int		wlf_check_file(int *l, int *a, int fd)
 {
 	char	*str1;
-	char	*tmp;
 	char	*buf;
 
-	tmp = NULL;
 	if (!(str1 = (char *)malloc(sizeof(char) * 11)))
 		return (-1);
 	if (!(buf = (char *)malloc(sizeof(char) * 10001)))
@@ -65,16 +65,17 @@ int		wlf_check_file(int *l, int *a, int fd)
 	ft_memset(str1, '\0', 11);
 	while (read(fd, buf, 10000) > 0)
 	{
-		tmp = str1;
-		if (!(str1 = ft_strjoin(str1, buf)))
-		{
-			ft_strdel(&tmp);
-			ft_strdel(&buf);
+		if (ft_isfullnum(buf))
 			return (-1);
-		}
-		ft_strdel(&tmp);
+		if (!(str1 = ft_strjoin_free(str1, buf)))
+			return (-1);
+		if (!(buf = (char *)malloc(sizeof(char) * 10001)))
+			return (-1);
 		ft_memset(buf, '\0', 10001);
 	}
+	free(buf);
+	if (ft_strlen(str1) < 10)
+		return (-1);
 	return (wlf_check_file2(&str1, l, a));
 }
 
@@ -129,7 +130,7 @@ t_map	*wlf_map_extract(int fd, char *filename)
 	m->c = a;
 	close(fd);
 	fd = open(filename, O_RDONLY);
-	if (!(m->map = wlf_put_in_map(m->map, fd)))
+	if (!(m->map = wlf_put_in_map(m->map, fd, m->c, m->l)))
 		return (NULL);
 	return (m);
 }
